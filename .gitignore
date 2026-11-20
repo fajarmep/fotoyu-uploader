@@ -1,0 +1,60 @@
+# ============================================================
+#  Folder DATA kerja - JANGAN diunggah (besar & berisi foto)
+# ============================================================
+Upload/
+Compress/
+Complete/
+Temp/
+
+# ============================================================
+#  Hanya macOS yang di-build (DMG). Folder Windows TIDAK diunggah.
+#  (Hapus baris "Windows/" ini bila nanti mau build Windows juga.)
+# ============================================================
+Windows/
+
+# ============================================================
+#  Build artifacts (tidak perlu di repo)
+# ============================================================
+build/
+dist/
+*.spec
+app.ico
+Windows/app.ico
+Windows/build/
+Windows/dist/
+Windows/Portable Windows/
+Windows/__pycache__/
+Windows/.build_venv/
+Windows/*.spec
+MacOS/build/
+MacOS/dist/
+MacOS/Portable MacOS/
+MacOS/__pycache__/
+MacOS/.build_venv/
+MacOS/.dmg_stage/
+MacOS/.app.iconset/
+MacOS/*.spec
+
+# ============================================================
+#  RAHASIA / konfigurasi lokal - JANGAN diunggah
+# ============================================================
+config.json
+Windows/config.json
+MacOS/config.json
+presets.json
+Windows/presets.json
+MacOS/presets.json
+history_uploaded.json
+Windows/history_uploaded.json
+MacOS/history_uploaded.json
+fotoyu_com_*.json
+
+# ============================================================
+#  Lain-lain
+# ============================================================
+*.pyc
+.DS_Store
+_dl/
+*.dmg
+*.zip
+__pycache__/

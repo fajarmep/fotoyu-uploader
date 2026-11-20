@@ -1,0 +1,42 @@
+name: Build DMG (macOS Universal)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  macos:
+    name: macOS Universal DMG
+    # Ganti runner bila perlu: macos-latest / macos-15 / macos-14 (Apple Silicon),
+    # atau macos-13 (Intel). Universal2 tetap bisa dibangun (Python universal2).
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Python universal2 (python.org)
+        run: |
+          set -e
+          PKG="python-3.12.7-macos11.pkg"
+          curl -fsSL -o "$PKG" "https://www.python.org/ftp/python/3.12.7/$PKG"
+          sudo installer -pkg "$PKG" -target /
+
+      - name: Build DMG (Universal)
+        working-directory: MacOS
+        env:
+          CI: "true"
+          # biar aman dipakai di macOS lama (floor arm64 = 11.0)
+          MACOSX_DEPLOYMENT_TARGET: "11.0"
+          PATH: /Library/Frameworks/Python.framework/Versions/3.12/bin:/usr/bin:/bin:/usr/sbin:/sbin
+        run: |
+          set -e
+          python3 --version
+          python3 -c "import sysconfig; print('platform:', sysconfig.get_platform())"
+          chmod +x build_macos.command
+          ./build_macos.command
+          echo "--- isi Portable MacOS ---"
+          ls -la "Portable MacOS"
+
+      - name: Upload DMG
+        uses: actions/upload-artifact@v4
+        with:
+          name: Portable-MacOS
+          path: MacOS/Portable MacOS/FotoYu Uploader.dmg

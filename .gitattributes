@@ -1,0 +1,13 @@
+* text=auto
+
+# Script macOS/Linux harus LF
+*.command text eol=lf
+*.sh      text eol=lf
+*.py      text eol=lf
+
+# Batch Windows harus CRLF
+*.bat text eol=crlf
+
+# Teks biasa
+*.txt text
+*.md  text

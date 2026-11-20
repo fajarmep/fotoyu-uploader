@@ -1,0 +1,3069 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FotoYu Uploader</title>
+<style>
+/* ==========================================================================
+   COLOR SCHEMES & CSS VARIABLES
+   Light: Inspired by light.png (#DCE7F3, #F3F8FC, #C1D8F0, #4663AC, #141E33)
+   Dark:  Inspired by dark.jpg (#141518, #2B2D33, #50545E, #9AA0AC, #E5E7EE)
+   ========================================================================== */
+:root, [data-theme="light"] {
+  --bg-app: #DCE7F3;
+  --bg-surface: #F3F8FC;
+  --card-bg: #FFFFFF;
+  --card-border: #C1D8F0;
+  --card-shadow: 0 1px 4px rgba(70, 99, 172, 0.08);
+  --primary: #4663AC;
+  --primary-hover: #3A5496;
+  --primary-active: #2E4378;
+  --text-main: #141E33;
+  --text-muted: #5A6B82;
+  --text-subtle: #7E8D9F;
+  --input-bg: #F8FAFD;
+  --input-border: #C1D8F0;
+  --input-focus: #4663AC;
+  --btn-secondary-bg: #EAF1FA;
+  --btn-secondary-border: #C1D8F0;
+  --btn-secondary-text: #27407D;
+  --table-header-bg: #E8F0F9;
+  --table-stripe: #F6FAFD;
+  --table-hover: #E2ECF8;
+  --border-subtle: #D2DEEB;
+  --zoom-backdrop: rgba(200, 217, 237, 0.94);
+  --status-bar-bg: #FFFFFF;
+  --status-bar-border: #C1D8F0;
+  --badge-bg: #E1EDFA;
+  --badge-text: #27407D;
+  --success: #2E7D32;
+  --danger: #D32F2F;
+  --warning: #ED6C02;
+  --info: #0288D1;
+  --matrix-bg: #F8FAFD;
+  --matrix-border: #D2DEEB;
+}
+
+[data-theme="dark"] {
+  --bg-app: #141518;
+  --bg-surface: #1E2024;
+  --card-bg: #23252B;
+  --card-border: #2B2D33;
+  --card-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  --primary: #4A72B8;
+  --primary-hover: #5C84CB;
+  --primary-active: #3C609E;
+  --text-main: #E5E7EE;
+  --text-muted: #9AA0AC;
+  --text-subtle: #6D7380;
+  --input-bg: #1A1C20;
+  --input-border: #3A3D45;
+  --input-focus: #5C84CB;
+  --btn-secondary-bg: #2B2D33;
+  --btn-secondary-border: #3A3D45;
+  --btn-secondary-text: #E5E7EE;
+  --table-header-bg: #1A1C20;
+  --table-stripe: #202228;
+  --table-hover: #2B2E36;
+  --border-subtle: #2B2D33;
+  --zoom-backdrop: rgba(20, 21, 24, 0.95);
+  --status-bar-bg: #1E2024;
+  --status-bar-border: #2B2D33;
+  --badge-bg: #2B2D33;
+  --badge-text: #9AA0AC;
+  --success: #4CAF50;
+  --danger: #F44336;
+  --warning: #FFA726;
+  --info: #29B6F6;
+  --matrix-bg: #1A1C20;
+  --matrix-border: #2B2D33;
+}
+
+/* ==========================================================================
+   GLOBAL RESET & TYPOGRAPHY (All font sizes strictly 12px)
+   ========================================================================== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 12px;
+}
+
+html, body {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  height: 100vh;
+  box-sizing: border-box;
+  overflow: hidden;
+  background-color: var(--bg-app);
+  color: var(--text-main);
+  user-select: none;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ==========================================================================
+   FORM INPUTS & BUTTONS - UNIFORM 30px HEIGHT
+   ========================================================================== */
+input[type="text"],
+input[type="password"],
+input[type="number"],
+input[type="date"],
+select {
+  height: 30px;
+  line-height: 30px;
+  padding: 0 10px;
+  border-radius: 6px;
+  border: 1px solid var(--input-border);
+  background-color: var(--input-bg);
+  color: var(--text-main);
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  width: 100%;
+}
+
+input:focus, select:focus {
+  border-color: var(--input-focus);
+  box-shadow: 0 0 0 2px rgba(70, 99, 172, 0.15);
+}
+
+input::placeholder {
+  color: var(--text-subtle);
+  opacity: 0.8;
+}
+
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  pointer-events: none !important;
+}
+
+.mode-inline-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 30px;
+  margin-bottom: 8px;
+}
+.mode-label {
+  font-weight: 600;
+  color: var(--text-main);
+  white-space: nowrap;
+  font-size: 12px;
+}
+.mode-select {
+  flex: 1;
+  height: 30px !important;
+  line-height: 30px;
+}
+
+.btn {
+  height: 30px;
+  line-height: 30px;
+  padding: 0 12px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  transition: background-color 0.15s, border-color 0.15s, opacity 0.15s;
+  white-space: nowrap;
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn-primary {
+  background-color: var(--primary);
+  color: #FFFFFF;
+}
+.btn-primary:hover {
+  background-color: var(--primary-hover);
+}
+
+.btn-secondary {
+  background-color: var(--btn-secondary-bg);
+  border-color: var(--btn-secondary-border);
+  color: var(--btn-secondary-text);
+}
+.btn-secondary:hover {
+  filter: brightness(0.96);
+}
+
+.btn-danger-outline {
+  background-color: transparent;
+  border-color: var(--danger);
+  color: var(--danger);
+}
+.btn-danger-outline:hover {
+  background-color: var(--danger);
+  color: #FFFFFF;
+}
+
+.btn-start {
+  height: 34px;
+  line-height: normal;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  background-color: #2E7D32;
+  color: #FFFFFF;
+  width: 100%;
+  border-radius: 6px;
+}
+.btn-start:hover {
+  background-color: #256628;
+}
+.btn-start.running {
+  background-color: #D32F2F;
+}
+.btn-start.running:hover {
+  background-color: #B71C1C;
+}
+#btnSaveConfig {
+  height: 34px !important;
+  line-height: normal;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  width: 100%;
+  border-radius: 6px;
+}
+.btn:disabled, .btn[disabled] {
+  opacity: 0.45;
+  cursor: not-allowed !important;
+  pointer-events: none;
+}
+.btn-start:disabled, .btn-start[disabled] {
+  background-color: #6c757d !important;
+  opacity: 0.55;
+  cursor: not-allowed !important;
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   TOP NAVBAR (NO APP ICON / NO APP NAME)
+   ========================================================================== */
+.navbar {
+  height: 38px;
+  min-height: 38px;
+  background-color: var(--bg-surface);
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 14px;
+}
+
+.nav-tabs {
+  display: flex;
+  gap: 8px;
+}
+
+.nav-tab {
+  height: 28px;
+  line-height: normal;
+  padding: 0 14px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+  vertical-align: middle;
+}
+
+.nav-tab:hover {
+  background-color: var(--btn-secondary-bg);
+  color: var(--text-main);
+}
+
+.nav-tab.active {
+  background-color: var(--primary);
+  color: #FFFFFF;
+}
+
+.btn-theme {
+  background-color: var(--btn-secondary-bg);
+  border-color: var(--btn-secondary-border);
+  color: var(--text-main);
+  padding: 0 12px;
+}
+
+/* ==========================================================================
+   VIEW CONTAINER & PANES
+   ========================================================================== */
+.view-container {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+.view-pane {
+  display: none;
+  flex: 1;
+  min-height: 0;
+  flex-direction: column;
+}
+
+.view-pane.active {
+  display: flex;
+}
+
+/* ==========================================================================
+   TAB 1: UPLOADER VIEW
+   ========================================================================== */
+.uploader-grid {
+  display: flex;
+  gap: 12px;
+  padding: 10px 14px;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  box-shadow: var(--card-shadow);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.card-half {
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.card-header {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border-subtle);
+  background-color: var(--bg-surface);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card-header h3 {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.card-body {
+  padding: 10px 12px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow-y: auto;
+  gap: 7px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  position: relative;
+}
+
+.label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.label-row label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-main);
+}
+
+.hint-fee {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--success);
+}
+
+.row-2col {
+  display: flex;
+  gap: 8px;
+}
+
+.row-2col > * {
+  flex: 1;
+}
+
+.input-with-btn {
+  display: flex;
+  gap: 6px;
+}
+
+.input-with-btn input {
+  flex: 1;
+}
+
+.pwd-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.pwd-wrapper input {
+  padding-right: 36px;
+}
+
+.btn-pwd {
+  position: absolute;
+  right: 4px;
+  width: 28px;
+  height: 24px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  border-radius: 4px;
+}
+.btn-pwd:hover {
+  background-color: var(--btn-secondary-bg);
+}
+
+/* Autocomplete Dropdown */
+.autocomplete-container {
+  position: relative;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  max-height: 150px;
+  overflow-y: auto;
+  background-color: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  z-index: 1000;
+  display: none;
+}
+
+.dropdown-item {
+  padding: 6px 10px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.dropdown-item:last-child {
+  border-bottom: none;
+}
+.dropdown-item:hover, .dropdown-item.active {
+  background-color: var(--table-hover);
+}
+.dropdown-item strong {
+  font-size: 12px;
+}
+.dropdown-item .loc-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* Operational Controls */
+.queue-box {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.queue-status-text {
+  font-weight: 600;
+  color: var(--primary);
+  font-size: 12px;
+  text-align: center;
+}
+
+.pb-container {
+  height: 10px;
+  background-color: var(--input-border);
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.pb-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), #38ef7d);
+  transition: width 0.2s ease;
+}
+
+.pb-footer {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.stat-progress-box {
+  margin: 10px 0 6px 0;
+  padding: 8px 12px;
+  background-color: var(--input-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 6px;
+}
+.stat-pb-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 5px;
+  font-weight: 500;
+}
+.stat-pb-container {
+  height: 8px;
+  background-color: var(--input-border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.stat-pb-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), #38ef7d);
+  transition: width 0.2s ease;
+}
+
+/* 2x2 Matrix Counter */
+.matrix-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.counter-box {
+  background-color: var(--matrix-bg);
+  border: 1px solid var(--matrix-border);
+  border-radius: 6px;
+  padding: 8px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.counter-box .val {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.counter-box .lbl {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.text-success { color: var(--success); }
+.text-danger { color: var(--danger); }
+.text-warning { color: var(--warning); }
+.text-info { color: var(--info); }
+
+/* ==========================================================================
+   LOG DRAWER
+   ========================================================================== */
+.log-toggle-bar {
+  height: 28px;
+  min-height: 28px;
+  background-color: var(--bg-surface);
+  border-top: 1px solid var(--border-subtle);
+  padding: 0 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--text-muted);
+  box-sizing: border-box;
+}
+.log-toggle-bar:hover {
+  background-color: var(--btn-secondary-bg);
+  color: var(--text-main);
+}
+
+.bar-left-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.bar-icon-box {
+  width: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 13px;
+  line-height: 1;
+}
+
+.log-drawer {
+  display: none;
+  height: 180px;
+  background-color: var(--card-bg);
+  border-top: 1px solid var(--border-subtle);
+  flex-direction: column;
+}
+
+.log-drawer-header {
+  height: 32px;
+  min-height: 32px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--bg-surface);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.log-filters {
+  display: flex;
+  gap: 6px;
+}
+
+.filter-btn {
+  height: 24px;
+  line-height: 24px;
+  padding: 0 8px;
+  font-size: 11px;
+  border-radius: 4px;
+  border: 1px solid var(--border-subtle);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.filter-btn.active {
+  background-color: var(--primary);
+  color: #FFFFFF;
+  border-color: var(--primary);
+}
+
+.log-table-wrap {
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* ==========================================================================
+   TAB 2: STATISTIK VIEW
+   ========================================================================== */
+.stat-container {
+  padding: 10px 14px;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
+}
+
+.stat-header-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: nowrap !important;
+  gap: 8px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.stat-filter-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  font-size: 11px;
+}
+
+.stat-action-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.date-input-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  width: 115px;
+  height: 30px;
+}
+
+.date-text-input {
+  width: 100% !important;
+  height: 30px !important;
+  line-height: 28px !important;
+  padding: 0 24px 0 8px !important;
+  border-radius: 6px;
+  border: 1px solid var(--input-border);
+  background-color: var(--input-bg);
+  color: var(--text-main);
+  font-size: 11px !important;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.date-native-hidden {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.date-calendar-icon {
+  position: absolute;
+  right: 6px;
+  cursor: pointer;
+  font-size: 11px;
+  user-select: none;
+  opacity: 0.7;
+  transition: opacity 0.15s;
+}
+
+.date-calendar-icon:hover {
+  opacity: 1;
+}
+
+.stat-action-btn {
+  height: 30px !important;
+  min-height: 30px !important;
+  max-height: 30px !important;
+  line-height: 1 !important;
+  padding: 0 10px !important;
+  font-size: 11px !important;
+  box-sizing: border-box !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 5px !important;
+  white-space: nowrap !important;
+  border-width: 1px !important;
+  border-style: solid !important;
+  vertical-align: middle !important;
+  overflow: hidden !important;
+}
+
+.stat-action-btn .btn-icon {
+  font-size: 11px !important;
+  line-height: 1 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.badge-storage {
+  height: 30px !important;
+  line-height: 28px !important;
+  padding: 0 10px !important;
+  border-radius: 6px !important;
+  background-color: var(--badge-bg);
+  color: var(--badge-text);
+  font-weight: 500;
+  border: 1px solid var(--border-subtle);
+  display: inline-flex !important;
+  align-items: center !important;
+  font-size: 11px !important;
+  white-space: nowrap !important;
+  box-sizing: border-box !important;
+}
+
+/* 8 KPI Cards Grid (2x4) */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.kpi-card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 6px;
+  padding: 8px 10px;
+  box-shadow: var(--card-shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.kpi-title {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.kpi-val {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+/* Sub-tabs inside Statistik */
+.subtabs-bar {
+  display: flex;
+  gap: 8px;
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 6px;
+}
+
+.subtab-btn {
+  height: 28px;
+  line-height: 28px;
+  padding: 0 12px;
+  border-radius: 4px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-weight: 500;
+}
+.subtab-btn:hover {
+  background-color: var(--btn-secondary-bg);
+}
+.subtab-btn.active {
+  background-color: var(--btn-secondary-bg);
+  border-color: var(--btn-secondary-border);
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.subtab-content {
+  display: none;
+  flex: 1;
+  min-height: 0;
+  flex-direction: column;
+}
+.subtab-content.active {
+  display: flex;
+}
+
+/* ==========================================================================
+   TABLES & SEPARATING COLUMN BORDERS (All th 1 line only)
+   ========================================================================== */
+.table-wrap {
+  flex: 1;
+  min-height: 180px;
+  overflow: auto;
+  border: 1px solid var(--card-border);
+  border-radius: 6px;
+  background-color: var(--card-bg);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+th, td {
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--border-subtle);
+  border-right: 1px solid var(--border-subtle);
+  font-size: 12px;
+  vertical-align: middle;
+  text-align: center !important;
+}
+
+th:last-child, td:last-child {
+  border-right: none;
+}
+
+th {
+  background-color: var(--table-header-bg);
+  color: var(--text-main);
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  text-align: center !important;
+  cursor: pointer;
+  user-select: none;
+}
+
+th:hover {
+  background-color: var(--table-hover) !important;
+}
+
+tbody tr:nth-child(even) {
+  background-color: var(--table-stripe);
+}
+
+tbody tr:hover {
+  background-color: var(--table-hover);
+  cursor: pointer;
+}
+
+.th-center, .td-center, .th-right, .td-right, .th-left, .td-left {
+  text-align: center !important;
+}
+
+.thumb-preview {
+  width: 38px;
+  height: 38px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid var(--border-subtle);
+  cursor: pointer;
+}
+
+/* Leaderboard Bar Chart */
+.chart-container {
+  padding: 12px;
+  background-color: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.chart-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.chart-label {
+  width: 160px;
+  font-size: 11px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chart-bar-track {
+  flex: 1;
+  height: 16px;
+  background-color: var(--input-bg);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.chart-bar-value {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.chart-count {
+  width: 50px;
+  text-align: right;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* ==========================================================================
+   STATUS BAR
+   ========================================================================== */
+.status-bar {
+  height: 28px;
+  min-height: 28px;
+  background-color: var(--status-bar-bg);
+  border-top: 1px solid var(--status-bar-border);
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  gap: 8px;
+}
+
+.status-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.status-dot.green { background-color: #2E7D32; box-shadow: 0 0 6px #2E7D32; }
+.status-dot.yellow { background-color: #ED6C02; box-shadow: 0 0 6px #ED6C02; }
+.status-dot.red { background-color: #D32F2F; box-shadow: 0 0 6px #D32F2F; }
+.status-dot.blue { background-color: #0288D1; box-shadow: 0 0 6px #0288D1; }
+
+.status-text {
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ==========================================================================
+   MODALS: Rincian Foto & Zoom Photo
+   ========================================================================== */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.45);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+.modal-overlay.active {
+  display: flex;
+}
+
+.modal-card {
+  width: 920px;
+  max-width: 95vw;
+  height: 520px;
+  max-height: 90vh;
+  background-color: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.modal-sm {
+  width: 380px !important;
+  max-width: 90vw !important;
+  height: auto !important;
+  max-height: 85vh !important;
+}
+
+.modal-md {
+  width: 480px !important;
+  max-width: 92vw !important;
+  height: auto !important;
+  max-height: 85vh !important;
+}
+
+.modal-header {
+  padding: 10px 14px;
+  background-color: var(--bg-surface);
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modal-header h3 {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.modal-close-btn {
+  background: transparent;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  color: var(--text-muted);
+}
+.modal-close-btn:hover {
+  color: var(--danger);
+}
+
+.modal-body {
+  padding: 10px 14px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow: hidden;
+}
+
+.modal-summary-bar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.modal-badge {
+  padding: 4px 10px;
+  border-radius: 4px;
+  background-color: var(--badge-bg);
+  color: var(--badge-text);
+  font-weight: 600;
+}
+
+/* Zoom Modal */
+.zoom-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--zoom-backdrop);
+  backdrop-filter: blur(4px);
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 20px;
+}
+.zoom-overlay.active {
+  display: flex;
+}
+
+.zoom-img-wrap {
+  position: relative;
+  max-width: 90vw;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.zoom-img {
+  max-width: 90vw;
+  max-height: 75vh;
+  object-fit: contain;
+  border-radius: 6px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.zoom-caption {
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--text-main);
+  background-color: var(--card-bg);
+  padding: 4px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border-subtle);
+}
+
+.zoom-close {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: var(--card-bg);
+  border: 1px solid var(--card-border);
+  color: var(--text-main);
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+</style>
+</head>
+<body>
+
+<!-- TOP NAVBAR -->
+<div class="navbar">
+  <div class="nav-tabs">
+    <button id="navTabUploader" class="nav-tab active" onclick="switchNavTab('uploader')"><span style="display:inline-flex;align-items:center;">🚀</span><span>Uploader</span></button>
+    <button id="navTabStatistik" class="nav-tab" onclick="switchNavTab('statistik')"><span style="display:inline-flex;align-items:center;">📊</span><span>Statistik</span></button>
+  </div>
+  <div>
+    <button id="btnThemeToggle" class="btn btn-theme" onclick="toggleTheme()">🌙 Mode Gelap</button>
+  </div>
+</div>
+
+<!-- MAIN VIEW CONTAINER -->
+<div class="view-container">
+
+  <!-- ========================================================================
+       VIEW 1: UPLOADER
+       ======================================================================== -->
+  <div id="viewUploader" class="view-pane active">
+    <div class="uploader-grid">
+
+      <!-- LEFT CARD: KONFIGURASI AKUN & UPLOAD -->
+      <div class="card card-half">
+        <div class="card-header">
+          <h3>Konfigurasi Akun & Upload</h3>
+        </div>
+        <div class="card-body">
+          <!-- Presets Row -->
+          <div class="input-with-btn">
+            <select id="presetSelect" onchange="onPresetSelected()">
+              <option value="">-- Pilih Preset --</option>
+            </select>
+            <button class="btn btn-secondary" onclick="openPresetModal()">+ Preset</button>
+            <button class="btn btn-danger-outline" onclick="deletePreset()">Hapus</button>
+          </div>
+
+          <!-- Username & Password -->
+          <div class="row-2col">
+            <div class="form-group">
+              <div class="label-row"><label>Username</label></div>
+              <input type="text" id="cfgUsername" placeholder="Username FotoYu" oninput="onCredsChanged(); checkFormValidity()">
+            </div>
+            <div class="form-group">
+              <div class="label-row"><label>Password</label></div>
+              <div class="pwd-wrapper">
+                <input type="password" id="cfgPassword" placeholder="Password FotoYu" oninput="onCredsChanged(); checkFormValidity()">
+                <button type="button" class="btn-pwd" id="btnTogglePwd" onclick="togglePasswordVisibility()">👁️</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Harga Satuan & Fototree -->
+          <div class="row-2col">
+            <div class="form-group">
+              <div class="label-row"><label>Harga Satuan (Rp)</label></div>
+              <input type="number" id="cfgPrice" placeholder="Harga Satuan (Rp)" oninput="checkFormValidity()">
+            </div>
+            <div class="form-group autocomplete-container">
+              <div class="label-row"><label>Fototree</label></div>
+              <input type="text" id="cfgFototree" placeholder="Cari Fototree..." oninput="onFototreeInput(); checkFormValidity()" onfocus="onFototreeFocus()" autocomplete="off">
+              <div id="treeDropdown" class="dropdown-menu"></div>
+              <input type="hidden" id="cfgTagId">
+              <input type="hidden" id="cfgLat">
+              <input type="hidden" id="cfgLon">
+            </div>
+          </div>
+
+          <!-- Lat & Lon Coordinates -->
+          <div class="row-2col">
+            <div class="form-group">
+              <div class="label-row"><label>Latitude</label></div>
+              <input type="text" id="dispLat" placeholder="Latitude (0.0)" onchange="onManualCoordChange()">
+            </div>
+            <div class="form-group">
+              <div class="label-row"><label>Longitude</label></div>
+              <input type="text" id="dispLon" placeholder="Longitude (0.0)" onchange="onManualCoordChange()">
+            </div>
+          </div>
+
+          <!-- Deskripsi Foto -->
+          <div class="form-group">
+            <div class="label-row"><label>Deskripsi Foto (Opsional)</label></div>
+            <input type="text" id="cfgDesc" placeholder="Deskripsi foto (opsional)">
+          </div>
+
+          <!-- Source Directory -->
+          <div class="form-group">
+            <div class="label-row"><label>Folder Source</label></div>
+            <div class="input-with-btn">
+              <input type="text" id="cfgUploadDir" placeholder="Folder Source (foto asli)" oninput="onFolderInputChanged('source')" onchange="onFolderInputChanged('source')">
+              <button class="btn btn-secondary" onclick="browseSourceFolder()">Pilih</button>
+              <button class="btn btn-secondary" id="btnOpenSource" onclick="openSourceFolder()" disabled>Buka</button>
+            </div>
+          </div>
+
+          <!-- Completed Directory -->
+          <div class="form-group">
+            <div class="label-row"><label>Folder Completed</label></div>
+            <div class="input-with-btn">
+              <input type="text" id="cfgCompleteDir" placeholder="Folder Completed" oninput="onFolderInputChanged('complete')" onchange="onFolderInputChanged('complete')">
+              <button class="btn btn-secondary" onclick="browseCompleteFolder()">Pilih</button>
+              <button class="btn btn-secondary" id="btnOpenComplete" onclick="openCompleteFolder()" disabled>Buka</button>
+            </div>
+          </div>
+
+          <!-- Save Konfigurasi Button -->
+          <button class="btn btn-primary" id="btnSaveConfig" onclick="saveConfiguration()" style="width: 100%; margin-top: 2px;">💾 Simpan Konfigurasi</button>
+        </div>
+      </div>
+
+      <!-- RIGHT CARD: KONTROL OPERASIONAL -->
+      <div class="card card-half">
+        <div class="card-header">
+          <h3>Kontrol Operasional</h3>
+        </div>
+        <div class="card-body">
+          <!-- Mode Upload (Sejajar dengan Preset) -->
+          <div class="mode-inline-row">
+            <span class="mode-label">Mode Upload:</span>
+            <select id="cfgMode" class="mode-select">
+              <option value="all">Semua (All)</option>
+              <option value="odd">Foto Angka Ganjil</option>
+              <option value="even">Foto Angka Genap</option>
+            </select>
+          </div>
+
+          <!-- Queue Box & Progress -->
+          <div class="queue-box">
+            <div id="queueText" class="queue-status-text">Antrean: 0 Source  |  0 Siap Upload</div>
+            <div class="pb-container">
+              <div id="pbFill" class="pb-fill" style="width: 0%;"></div>
+            </div>
+            <div class="pb-footer">
+              <span id="pbLabel">Menunggu proses...</span>
+              <span id="pbPct">0%</span>
+            </div>
+          </div>
+
+          <!-- 2x2 Matrix Counter -->
+          <div class="matrix-grid">
+            <div class="counter-box">
+              <span class="val text-success" id="cntCompOk">0</span>
+              <span class="lbl">Kompres Sukses</span>
+            </div>
+            <div class="counter-box">
+              <span class="val text-danger" id="cntCompFail">0</span>
+              <span class="lbl">Kompres Gagal</span>
+            </div>
+            <div class="counter-box">
+              <span class="val text-success" id="cntUpOk">0</span>
+              <span class="lbl">Upload Sukses</span>
+            </div>
+            <div class="counter-box">
+              <span class="val text-danger" id="cntUpFail">0</span>
+              <span class="lbl">Upload Gagal</span>
+            </div>
+          </div>
+
+          <!-- Reset, Retry & Anti-Duplikat Buttons -->
+          <div style="display: flex; gap: 6px;">
+            <button class="btn btn-secondary" style="flex: 1;" onclick="resetCounters()">🔄 Reset Counter</button>
+            <button class="btn btn-secondary" style="flex: 1;" onclick="retryFailed()">🔁 Ulangi Gagal</button>
+            <button class="btn btn-secondary" style="flex: 1.1;" onclick="openDuplicateModal()">🛡️ Anti-Duplikat</button>
+          </div>
+
+          <!-- Big Mulai / Berhenti Button -->
+          <button id="btnStartStop" class="btn btn-start" onclick="toggleStartStop()" disabled>🚀 Mulai Proses</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- LOG DRAWER (EXPANDABLE) -->
+    <div class="log-toggle-bar" onclick="toggleLog()">
+      <div class="bar-left-content">
+        <span class="bar-icon-box">📋</span>
+        <span id="logSummaryText">Log Aktivitas (OK: 0 | Gagal: 0 | Info: 0 | Skip: 0)</span>
+      </div>
+      <span id="logToggleArrow">▲ Buka Log</span>
+    </div>
+    <div id="logDrawer" class="log-drawer">
+      <div class="log-drawer-header">
+        <div class="log-filters">
+          <button class="filter-btn active" data-filter="all" onclick="filterLogs('all')">Semua</button>
+          <button class="filter-btn" data-filter="ok" onclick="filterLogs('ok')">OK</button>
+          <button class="filter-btn" data-filter="fail" onclick="filterLogs('fail')">Gagal</button>
+          <button class="filter-btn" data-filter="info" onclick="filterLogs('info')">Info</button>
+          <button class="filter-btn" data-filter="skip" onclick="filterLogs('skip')">Skip</button>
+        </div>
+        <button class="btn btn-secondary" style="height: 24px; line-height: 24px; padding: 0 8px; font-size: 11px;" onclick="clearLogs()">Bersihkan</button>
+      </div>
+      <div class="log-table-wrap">
+        <table id="tableLogs">
+          <thead>
+            <tr>
+              <th style="width: 70px;">Waktu</th>
+              <th style="width: 80px;">Aksi</th>
+              <th style="width: 200px;">Nama File</th>
+              <th>Keterangan</th>
+              <th style="width: 70px;" class="th-center">Status</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyLogs">
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       VIEW 2: STATISTIK
+       ======================================================================== -->
+  <div id="viewStatistik" class="view-pane">
+    <div class="stat-container">
+
+      <!-- Top Filter & Action Bar (1 Baris Sejajar: Filter Tanggal, Reset, Penyimpanan, Muat Ulang & Update All Data) -->
+      <div class="stat-header-bar">
+        <div class="stat-filter-row">
+          <span>Rentang Tanggal:</span>
+          <div class="date-input-wrap">
+            <input type="text" id="statDateStartDisp" class="date-text-input" placeholder="DD/MM/YYYY" maxlength="10" oninput="formatDateInput(this)" onchange="applyStatFilterFromDisplay()">
+            <input type="date" id="statDateStartNative" class="date-native-hidden" onchange="syncNativeToDisp('start')">
+            <span class="date-calendar-icon" onclick="openNativeDatePicker('start')" title="Pilih Tanggal">📅</span>
+          </div>
+          <span>s/d</span>
+          <div class="date-input-wrap">
+            <input type="text" id="statDateEndDisp" class="date-text-input" placeholder="DD/MM/YYYY" maxlength="10" oninput="formatDateInput(this)" onchange="applyStatFilterFromDisplay()">
+            <input type="date" id="statDateEndNative" class="date-native-hidden" onchange="syncNativeToDisp('end')">
+            <span class="date-calendar-icon" onclick="openNativeDatePicker('end')" title="Pilih Tanggal">📅</span>
+          </div>
+          <button class="btn btn-secondary stat-action-btn" onclick="resetStatFilter()">Reset Filter</button>
+        </div>
+        <div class="stat-action-row">
+          <span class="badge-storage" id="statStorageBadge">Penyimpanan: -</span>
+          <button class="btn btn-secondary stat-action-btn" onclick="loadStatistics(false)" title="Muat data baru secara cepat (incremental)"><span class="btn-icon">🔄</span> Muat Ulang</button>
+          <button class="btn btn-primary stat-action-btn" onclick="openModalConfirmUpdateAll()" title="Pindai ulang seluruh riwayat foto & timpa cache"><span class="btn-icon">⚡</span> Update All Data</button>
+        </div>
+      </div>
+
+      <!-- 8 KPI Cards (2x4) -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <span class="kpi-title">Total Foto</span>
+          <span class="kpi-val" id="statTotalPhotos">0</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-title">Deteksi Wajah</span>
+          <span class="kpi-val" id="statTotalFaces">0</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-title">AK+ Cocok</span>
+          <span class="kpi-val" id="statTotalAkPlus">0</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-title">AK- Rendah</span>
+          <span class="kpi-val" id="statTotalAkMin">0</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-title">Terkonfirmasi</span>
+          <span class="kpi-val" id="statTotalKonfirm">0</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-title">Terjual</span>
+          <span class="kpi-val text-success" id="statTotalSold">0</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-title">Estimasi Omset</span>
+          <span class="kpi-val text-success" id="statTotalRev">Rp 0</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-title">Rasio Konversi</span>
+          <span class="kpi-val text-info" id="statConvRate">0.0%</span>
+        </div>
+      </div>
+
+      <!-- STATISTIK PROGRESS BAR -->
+      <div id="statProgressBox" class="stat-progress-box" style="display: none;">
+        <div class="stat-pb-header">
+          <span id="statPbLabel">Memuat data statistik...</span>
+          <span id="statPbPct">0%</span>
+        </div>
+        <div class="stat-pb-container">
+          <div id="statPbFill" class="stat-pb-fill" style="width: 0%;"></div>
+        </div>
+      </div>
+
+      <!-- Sub-tabs Bar -->
+      <div class="subtabs-bar">
+        <button id="subtabBtnDates" class="subtab-btn active" onclick="switchStatSubTab('dates')">📅 Penjualan per Tanggal</button>
+        <button id="subtabBtnLeaderboard" class="subtab-btn" onclick="switchStatSubTab('leaderboard')">🏆 Leaderboard</button>
+        <button id="subtabBtnSold" class="subtab-btn" onclick="switchStatSubTab('sold')">🖼️ Semua Foto Terjual</button>
+      </div>
+
+      <!-- Sub-tab 1: Penjualan per Tanggal -->
+      <div id="subtabDates" class="subtab-content active">
+        <div class="table-wrap">
+          <table id="tableDates">
+            <thead>
+              <tr>
+                <th style="width: 110px;">Tanggal</th>
+                <th style="width: 60px;" class="th-right">Foto</th>
+                <th style="width: 65px;" class="th-right">Wajah</th>
+                <th style="width: 65px;" class="th-right">AK+</th>
+                <th style="width: 65px;" class="th-right">AK-</th>
+                <th style="width: 75px;" class="th-right">Konfirm</th>
+                <th style="width: 65px;" class="th-right">Terjual</th>
+                <th style="width: 120px;" class="th-right">Estimasi Omset</th>
+                <th style="width: 110px;">Keterangan</th>
+                <th style="width: 75px;" class="th-center">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="tbodyDates">
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Sub-tab 2: Leaderboard (No icons inside tabs/headers, clean full-width table) -->
+      <div id="subtabLeaderboard" class="subtab-content">
+        <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+          <button id="btnLbTree" class="btn btn-secondary active" onclick="setLeaderboardMode('tree')">Berdasarkan Fototree</button>
+          <button id="btnLbDate" class="btn btn-secondary" onclick="setLeaderboardMode('date')">Berdasarkan Tanggal</button>
+        </div>
+
+        <!-- Visual Bar Chart -->
+        <div id="lbChart" class="chart-container"></div>
+
+        <!-- Leaderboard Table (Full Width) -->
+        <div class="table-wrap">
+          <table id="tableLeaderboard">
+            <thead>
+              <tr>
+                <th style="width: 50px;" class="th-center">No</th>
+                <th id="thLbName">Nama Fototree</th>
+                <th style="width: 120px;" class="th-right">Terjual (Foto)</th>
+                <th style="width: 160px;" class="th-right">Estimasi Omset</th>
+              </tr>
+            </thead>
+            <tbody id="tbodyLeaderboard">
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Sub-tab 3: Semua Foto Terjual -->
+      <div id="subtabSold" class="subtab-content">
+        <div class="table-wrap">
+          <table id="tableSold">
+            <thead>
+              <tr>
+                <th>Judul Foto</th>
+                <th style="width: 150px;">Fototree</th>
+                <th style="width: 105px;">Tanggal</th>
+                <th style="width: 100px;">Harga</th>
+                <th style="width: 105px;">Net Kreator</th>
+                <th style="width: 75px;">Preview</th>
+              </tr>
+            </thead>
+            <tbody id="tbodySold">
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- BOTTOM STATUS BAR -->
+<div class="status-bar">
+  <div class="bar-left-content">
+    <span class="bar-icon-box"><span id="statusDot" class="status-dot green"></span></span>
+    <span id="statusText" class="status-text">Siap. Isi konfigurasi & pilih folder lalu klik Mulai Proses.</span>
+  </div>
+</div>
+
+<!-- ========================================================================
+     MODAL 1: RINCIAN FOTO POPUP
+     ======================================================================== -->
+<div id="modalPhotoDetail" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h3>Rincian Foto - Tanggal: <span id="modalDateTitle">-</span></h3>
+      <button class="modal-close-btn" onclick="closePhotoDetailModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div class="modal-summary-bar">
+          <span class="modal-badge" id="modalBadgeTotal">Total: 0 Foto</span>
+          <span class="modal-badge" style="background-color: var(--success); color: #fff;" id="modalBadgeSold">Terjual: 0 Foto</span>
+          <span class="modal-badge" id="modalBadgeEstRev">Estimasi Omset: Rp 0</span>
+        </div>
+        <div style="display: flex; gap: 6px;">
+          <button class="filter-btn active" data-mfilter="all" onclick="filterModalPhotos('all')">Semua</button>
+          <button class="filter-btn" data-mfilter="sold" onclick="filterModalPhotos('sold')">Terjual</button>
+          <button class="filter-btn" data-mfilter="available" onclick="filterModalPhotos('available')">Tersedia</button>
+        </div>
+      </div>
+
+      <div class="table-wrap" style="flex: 1;">
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 130px;">ID / Judul</th>
+              <th>Fototree</th>
+              <th style="width: 95px;">Resolusi</th>
+              <th style="width: 70px;">Ukuran</th>
+              <th style="width: 50px;">Wajah</th>
+              <th style="width: 75px;">RoboFind</th>
+              <th style="width: 75px;">Status</th>
+              <th style="width: 85px;">Harga</th>
+              <th style="width: 95px;">Net Kreator</th>
+              <th style="width: 70px;">Preview</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyModalPhotos">
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================================================
+     MODAL 2: ZOOM PHOTO PREVIEW
+     ======================================================================== -->
+<div id="modalZoom" class="zoom-overlay" onclick="closeZoomModal(event)">
+  <button class="zoom-close" onclick="closeZoomModal(event, true)">✕</button>
+  <div class="zoom-img-wrap" onclick="event.stopPropagation()">
+    <img id="zoomImg" class="zoom-img" src="" alt="Preview Foto">
+    <div id="zoomCaption" class="zoom-caption">Memuat foto...</div>
+  </div>
+</div>
+
+<!-- ========================================================================
+     MODAL 3: INPUT NAMA PRESET
+     ======================================================================== -->
+<div id="modalPresetName" class="modal-overlay">
+  <div class="modal-card modal-sm">
+    <div class="modal-header">
+      <h3>Simpan Preset Event</h3>
+      <button class="modal-close-btn" onclick="closePresetModal()">✕</button>
+    </div>
+    <div class="modal-body" style="gap: 12px; padding: 14px;">
+      <div class="form-group">
+        <div class="label-row"><label>Nama Preset</label></div>
+        <input type="text" id="inputPresetName" placeholder="Contoh: Malioboro Pagi" onkeydown="if(event.key==='Enter') confirmSavePreset()">
+      </div>
+      <div style="display: flex; justify-content: flex-end; gap: 8px;">
+        <button class="btn btn-secondary" onclick="closePresetModal()">Batal</button>
+        <button class="btn btn-primary" onclick="confirmSavePreset()">Simpan</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================================================
+     MODAL 4: KELOLA RIWAYAT ANTI-DUPLIKAT
+     ======================================================================== -->
+<div id="modalDuplicates" class="modal-overlay">
+  <div class="modal-card modal-md">
+    <div class="modal-header">
+      <h3>Kelola Riwayat Anti-Duplikat</h3>
+      <button class="modal-close-btn" onclick="closeDuplicateModal()">✕</button>
+    </div>
+    <div class="modal-body" style="gap: 12px; padding: 14px;">
+      <div style="font-size: 13px; font-weight: 600; color: var(--primary);" id="dupCountText">
+        Total foto terindeks dalam Anti-Duplikat: 0 Foto
+      </div>
+      <div style="color: var(--text-muted); font-size: 11px; line-height: 1.5;">
+        Riwayat Anti-Duplikat mencegah file foto yang sama diunggah dua kali.<br>
+        Bersihkan riwayat hanya jika Anda ingin mengunggah ulang foto tersebut.
+      </div>
+      <div style="display: flex; gap: 8px; margin-top: 4px;">
+        <button class="btn btn-secondary" onclick="reindexDuplicates()">🔄 Indeks Ulang Completed</button>
+        <button class="btn btn-danger-outline" onclick="clearDuplicates()">🗑️ Bersihkan Riwayat</button>
+      </div>
+      <div style="display: flex; justify-content: flex-end; margin-top: 8px;">
+        <button class="btn btn-secondary" onclick="closeDuplicateModal()">Tutup</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================================================
+     MODAL 5: KONFIRMASI SIMPAN KONFIGURASI
+     ======================================================================== -->
+<div id="modalSaveSuccess" class="modal-overlay">
+  <div class="modal-card modal-sm">
+    <div class="modal-header">
+      <h3>Informasi Simpan</h3>
+      <button class="modal-close-btn" onclick="closeSaveSuccessModal()">✕</button>
+    </div>
+    <div class="modal-body" style="gap: 12px; padding: 16px; text-align: center;">
+      <div style="font-size: 32px;">💾</div>
+      <div style="font-size: 13px; font-weight: 600; color: var(--text-main);">Konfigurasi Berhasil Disimpan</div>
+      <div style="color: var(--text-muted); font-size: 11px; line-height: 1.4;">
+        Semua isian konfigurasi akun, harga, lokasi, dan folder destinasi telah berhasil disimpan ke berkas <b>config.json</b>.
+      </div>
+      <div style="display: flex; justify-content: center; margin-top: 8px;">
+        <button class="btn btn-primary" style="min-width: 90px;" onclick="closeSaveSuccessModal()">OK</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================================================
+     MODAL 6: KONFIRMASI UPDATE ALL DATA
+     ======================================================================== -->
+<div id="modalConfirmUpdateAll" class="modal-overlay">
+  <div class="modal-card" style="max-width: 440px;">
+    <div class="modal-header">
+      <h3 style="color: var(--primary);">⚡ Konfirmasi Update All Data</h3>
+      <button class="modal-close-btn" onclick="closeModalConfirmUpdateAll()">✕</button>
+    </div>
+    <div class="modal-body" style="gap: 12px; padding: 16px; font-size: 12px; line-height: 1.6; color: var(--text-main);">
+      <p style="margin: 0;">
+        <strong>Update All Data</strong> akan memindai ulang seluruh riwayat foto dari FotoYu, memperbarui perubahan foto-foto lama (seperti perubahan harga, fototree, tag), dan menyimpannya kembali ke cache lokal.
+      </p>
+      <p style="margin: 0; color: var(--text-muted); font-size: 11px;">
+        Proses ini mungkin membutuhkan waktu beberapa saat tergantung jumlah total foto Anda. Lanjutkan proses?
+      </p>
+    </div>
+    <div class="modal-footer" style="padding: 12px 16px; display: flex; justify-content: flex-end; gap: 8px; border-top: 1px solid var(--border-subtle);">
+      <button class="btn btn-secondary" onclick="closeModalConfirmUpdateAll()">Batal</button>
+      <button class="btn btn-primary" onclick="proceedUpdateAllData()">Ya, Update Semua</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================================================
+     JAVASCRIPT APPLICATION LOGIC
+     ======================================================================== -->
+<script>
+// Global State
+let currentConfig = {};
+let currentPresets = {};
+let currentStatistics = null;
+let currentModalItems = [];
+let currentLogFilter = 'all';
+let currentModalFilter = 'all';
+let currentLbMode = 'tree';
+let isRunning = false;
+let isLogOpen = false;
+let searchTimer = null;
+let priceFeeTimer = null;
+let allLogs = [];
+
+// Formatters
+function formatIdr(num) {
+  if (num === null || num === undefined || isNaN(num)) return "Rp 0";
+  return "Rp " + Math.round(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+}
+
+function escapeHtml(str) {
+  if (!str) return "";
+  return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+// --------------------------------------------------------------------------
+// THEME SWITCHER
+// --------------------------------------------------------------------------
+let currentTheme = 'light';
+
+function setTheme(t) {
+  currentTheme = (t === 'dark') ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', currentTheme);
+  document.body.setAttribute('data-theme', currentTheme);
+  try {
+    localStorage.setItem('fotoyu_theme', currentTheme);
+  } catch (e) {}
+
+  const btn = document.getElementById('btnThemeToggle');
+  if (btn) {
+    if (currentTheme === 'dark') {
+      btn.innerHTML = '☀️ Mode Terang';
+      btn.title = 'Beralih ke Mode Terang';
+    } else {
+      btn.innerHTML = '🌙 Mode Gelap';
+      btn.title = 'Beralih ke Mode Gelap';
+    }
+  }
+
+  if (window.pywebview && window.pywebview.api && window.pywebview.api.save_theme) {
+    window.pywebview.api.save_theme(currentTheme).catch(() => {});
+  }
+}
+
+function toggleTheme() {
+  setTheme(currentTheme === 'dark' ? 'light' : 'dark');
+}
+
+// Initialize theme immediately and safely
+(function initTheme() {
+  let saved = 'light';
+  try {
+    saved = localStorage.getItem('fotoyu_theme') || 'light';
+  } catch (e) {
+    saved = 'light';
+  }
+  setTheme(saved);
+})();
+
+// --------------------------------------------------------------------------
+// NAVIGATION TABS
+// --------------------------------------------------------------------------
+function switchNavTab(tab) {
+  document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.view-pane').forEach(p => p.classList.remove('active'));
+
+  if (tab === 'uploader') {
+    document.getElementById('navTabUploader').classList.add('active');
+    document.getElementById('viewUploader').classList.add('active');
+  } else if (tab === 'statistik') {
+    document.getElementById('navTabStatistik').classList.add('active');
+    document.getElementById('viewStatistik').classList.add('active');
+    if (!currentStatistics) {
+      loadStatistics();
+    }
+  }
+}
+
+// --------------------------------------------------------------------------
+// PASSWORD VISIBILITY TOGGLE
+// --------------------------------------------------------------------------
+function togglePasswordVisibility() {
+  const inp = document.getElementById('cfgPassword');
+  const btn = document.getElementById('btnTogglePwd');
+  if (inp.type === 'password') {
+    inp.type = 'text';
+    btn.textContent = '🙈';
+  } else {
+    inp.type = 'password';
+    btn.textContent = '👁️';
+  }
+}
+
+// --------------------------------------------------------------------------
+// FORM BINDINGS & REALTIME FEE
+// --------------------------------------------------------------------------
+function onPriceInput() {
+  // Net Kreator hint removed as requested
+}
+
+function updateFeeHint(price) {
+  // Net Kreator hint removed as requested
+}
+
+function onCredsChanged() {
+  // auto trigger queue or state if needed
+}
+
+function onManualCoordChange() {
+  const lat = document.getElementById('dispLat').value;
+  const lon = document.getElementById('dispLon').value;
+  document.getElementById('cfgLat').value = lat;
+  document.getElementById('cfgLon').value = lon;
+}
+
+// --------------------------------------------------------------------------
+// FOTOTREE AUTOCOMPLETE (Clean without '(-)')
+// --------------------------------------------------------------------------
+function onFototreeInput() {
+  clearTimeout(searchTimer);
+  const q = document.getElementById('cfgFototree').value.trim();
+  const dropdown = document.getElementById('treeDropdown');
+  if (!q) {
+    dropdown.style.display = 'none';
+    dropdown.innerHTML = '';
+    return;
+  }
+  searchTimer = setTimeout(() => {
+    performTreeSearch(q);
+  }, 350);
+}
+
+function onFototreeFocus() {
+  const q = document.getElementById('cfgFototree').value.trim();
+  if (q) performTreeSearch(q);
+}
+
+function performTreeSearch(q) {
+  const dropdown = document.getElementById('treeDropdown');
+  const u = document.getElementById('cfgUsername').value;
+  const p = document.getElementById('cfgPassword').value;
+
+  if (window.pywebview && window.pywebview.api) {
+    window.pywebview.api.search_fototree(q, u, p).then(results => {
+      renderTreeDropdown(results);
+    }).catch(err => {
+      dropdown.style.display = 'none';
+    });
+  }
+}
+
+function renderTreeDropdown(results) {
+  const dropdown = document.getElementById('treeDropdown');
+  dropdown.innerHTML = '';
+  if (!results || results.length === 0) {
+    dropdown.style.display = 'none';
+    return;
+  }
+
+  results.forEach(item => {
+    const div = document.createElement('div');
+    div.className = 'dropdown-item';
+    // Remove '(-)' if location is empty or '-'
+    const hasLoc = item.location && item.location.trim() !== '' && item.location.trim() !== '-';
+    const locHtml = hasLoc ? ` <span class="loc-sub">(${escapeHtml(item.location)})</span>` : '';
+    div.innerHTML = `<div><strong>${escapeHtml(item.name)}</strong>${locHtml}</div>`;
+    div.onclick = () => {
+      document.getElementById('cfgFototree').value = item.name;
+      const tagId = item.tag_id || item.id || "";
+      document.getElementById('cfgTagId').value = tagId;
+      if (currentConfig) {
+        currentConfig.tag_id = tagId;
+        currentConfig.fototree = item.name;
+        currentConfig.location_name = item.name;
+      }
+      document.getElementById('cfgLat').value = item.lat || "0.0";
+      document.getElementById('cfgLon').value = item.lon || "0.0";
+      document.getElementById('dispLat').value = item.lat || "0.0";
+      document.getElementById('dispLon').value = item.lon || "0.0";
+      dropdown.style.display = 'none';
+      checkFormValidity();
+    };
+    dropdown.appendChild(div);
+  });
+  dropdown.style.display = 'block';
+}
+
+document.addEventListener('click', (e) => {
+  const container = document.querySelector('.autocomplete-container');
+  if (container && !container.contains(e.target)) {
+    const dropdown = document.getElementById('treeDropdown');
+    if (dropdown) dropdown.style.display = 'none';
+  }
+});
+
+// --------------------------------------------------------------------------
+// DIRECTORY BROWSING & ACTIONS
+// --------------------------------------------------------------------------
+function browseSourceFolder() {
+  if (window.pywebview && window.pywebview.api) {
+    const cur = document.getElementById('cfgUploadDir').value;
+    window.pywebview.api.pick_source_dir(cur).then(dir => {
+      if (dir) {
+        document.getElementById('cfgUploadDir').value = dir;
+        // Realtime queue update immediately on change!
+        window.pywebview.api.refresh_queue().then(res => {
+          if (res && res.text) document.getElementById('queueText').textContent = res.text;
+        });
+        checkFormValidity();
+      }
+    });
+  }
+}
+
+function browseCompleteFolder() {
+  if (window.pywebview && window.pywebview.api) {
+    const cur = document.getElementById('cfgCompleteDir').value;
+    window.pywebview.api.pick_complete_dir(cur).then(dir => {
+      if (dir) {
+        document.getElementById('cfgCompleteDir').value = dir;
+        checkFormValidity();
+      }
+    });
+  }
+}
+
+let savedSourcePath = "";
+let savedCompletePath = "";
+
+function updateFolderOpenButtons() {
+  const src = (document.getElementById('cfgUploadDir').value || '').trim();
+  const comp = (document.getElementById('cfgCompleteDir').value || '').trim();
+
+  const btnOpenSrc = document.getElementById('btnOpenSource');
+  if (btnOpenSrc) {
+    const isSrcSaved = Boolean(src && savedSourcePath && src === savedSourcePath);
+    btnOpenSrc.disabled = !isSrcSaved;
+    btnOpenSrc.title = isSrcSaved ? "Buka folder di File Explorer" : "Kolom harus terisi dan disimpan / hasil load preset";
+  }
+
+  const btnOpenComp = document.getElementById('btnOpenComplete');
+  if (btnOpenComp) {
+    const isCompSaved = Boolean(comp && savedCompletePath && comp === savedCompletePath);
+    btnOpenComp.disabled = !isCompSaved;
+    btnOpenComp.title = isCompSaved ? "Buka folder di File Explorer" : "Kolom harus terisi dan disimpan / hasil load preset";
+  }
+}
+
+function openSourceFolder() {
+  const p = (document.getElementById('cfgUploadDir').value || '').trim();
+  if (window.pywebview && window.pywebview.api && p) {
+    window.pywebview.api.open_folder(p);
+  }
+}
+
+function openCompleteFolder() {
+  const p = (document.getElementById('cfgCompleteDir').value || '').trim();
+  if (window.pywebview && window.pywebview.api && p) {
+    window.pywebview.api.open_folder(p);
+  }
+}
+
+function onFolderInputChanged(type) {
+  if (type === 'source' && window.pywebview && window.pywebview.api) {
+    window.pywebview.api.refresh_queue().then(res => {
+      if (res && res.text) document.getElementById('queueText').textContent = res.text;
+    });
+  }
+  checkFormValidity();
+}
+
+// --------------------------------------------------------------------------
+// FORM VALIDITY & CONFIG SAVE
+// --------------------------------------------------------------------------
+function checkFormValidity() {
+  const u = (document.getElementById('cfgUsername').value || '').trim();
+  const p = (document.getElementById('cfgPassword').value || '');
+  const price = parseInt(document.getElementById('cfgPrice').value || '0', 10);
+  const tree = (document.getElementById('cfgFototree').value || '').trim();
+  const src = (document.getElementById('cfgUploadDir').value || '').trim();
+  const comp = (document.getElementById('cfgCompleteDir').value || '').trim();
+
+  updateFolderOpenButtons();
+
+  // Check required fields for Mulai button
+  const isValid = Boolean(u && p && price > 0 && tree && src && comp);
+  const btnStart = document.getElementById('btnStartStop');
+  if (btnStart && !isRunning) {
+    btnStart.disabled = !isValid;
+    btnStart.title = isValid ? "Klik untuk memulai proses kompresi & upload" : "Lengkapi semua isian form untuk memulai";
+  }
+}
+
+function openSaveSuccessModal() {
+  const modal = document.getElementById('modalSaveSuccess');
+  if (modal) modal.classList.add('active');
+}
+
+function closeSaveSuccessModal() {
+  const modal = document.getElementById('modalSaveSuccess');
+  if (modal) modal.classList.remove('active');
+}
+
+function saveConfiguration() {
+  const data = getFormData();
+  const btn = document.getElementById('btnSaveConfig');
+  if (window.pywebview && window.pywebview.api) {
+    window.pywebview.api.save_config(data).then(ok => {
+      if (ok) {
+        savedSourcePath = (document.getElementById('cfgUploadDir').value || '').trim();
+        savedCompletePath = (document.getElementById('cfgCompleteDir').value || '').trim();
+        updateFolderOpenButtons();
+        openSaveSuccessModal();
+        if (btn) {
+          const oldText = btn.textContent;
+          btn.textContent = "✔️ Konfigurasi Tersimpan!";
+          setTimeout(() => { btn.textContent = oldText; }, 1600);
+        }
+      }
+    });
+  }
+}
+
+// --------------------------------------------------------------------------
+// PRESETS MANAGEMENT (Modal Custom Sesuai Color Scheme)
+// --------------------------------------------------------------------------
+function renderPresets(presets, selName = "") {
+  currentPresets = presets || {};
+  const sel = document.getElementById('presetSelect');
+  sel.innerHTML = '<option value="">-- Pilih Preset --</option>';
+  Object.keys(currentPresets).forEach(name => {
+    const opt = document.createElement('option');
+    opt.value = name;
+    opt.textContent = name;
+    if (name === selName) opt.selected = true;
+    sel.appendChild(opt);
+  });
+}
+
+function onPresetSelected() {
+  const sel = document.getElementById('presetSelect');
+  const name = sel.value;
+  if (!name || !currentPresets[name]) return;
+  const p = currentPresets[name];
+  if (currentConfig) {
+    currentConfig.active_preset = name;
+  }
+  if (window.pywebview && window.pywebview.api && window.pywebview.api.set_active_preset) {
+    window.pywebview.api.set_active_preset(name);
+  }
+  if (p.username) document.getElementById('cfgUsername').value = p.username;
+  if (p.password) document.getElementById('cfgPassword').value = p.password;
+  if (p.price) {
+    document.getElementById('cfgPrice').value = p.price;
+  }
+  if (p.fototree || p.location_name) document.getElementById('cfgFototree').value = p.fototree || p.location_name;
+  if (p.tag_id) {
+    document.getElementById('cfgTagId').value = p.tag_id;
+    if (currentConfig) currentConfig.tag_id = p.tag_id;
+  }
+  const lat = p.lat || p.latitude || "0.0";
+  const lon = p.lon || p.longitude || "0.0";
+  document.getElementById('cfgLat').value = lat;
+  document.getElementById('dispLat').value = lat;
+  document.getElementById('cfgLon').value = lon;
+  document.getElementById('dispLon').value = lon;
+
+  if (p.desc || p.description) document.getElementById('cfgDesc').value = p.desc || p.description;
+  if (p.mode) document.getElementById('cfgMode').value = p.mode;
+
+  const upDir = p.upload_dir || p.source_dir || "";
+  document.getElementById('cfgUploadDir').value = upDir;
+  savedSourcePath = upDir.trim();
+
+  const compDir = p.complete_dir || "";
+  document.getElementById('cfgCompleteDir').value = compDir;
+  savedCompletePath = compDir.trim();
+
+  if (window.pywebview && window.pywebview.api) {
+    window.pywebview.api.refresh_queue();
+  }
+  updateFolderOpenButtons();
+  checkFormValidity();
+}
+
+function getFormData() {
+  const sel = document.getElementById('presetSelect');
+  const activePreset = sel ? sel.value : "";
+  const tagId = document.getElementById('cfgTagId').value.trim() || (currentConfig && currentConfig.tag_id) || "";
+  return {
+    active_preset: activePreset,
+    username: document.getElementById('cfgUsername').value.trim(),
+    password: document.getElementById('cfgPassword').value,
+    price: document.getElementById('cfgPrice').value.trim(),
+    fototree: document.getElementById('cfgFototree').value.trim(),
+    lat: document.getElementById('cfgLat').value.trim() || document.getElementById('dispLat').value.trim(),
+    lon: document.getElementById('cfgLon').value.trim() || document.getElementById('dispLon').value.trim(),
+    desc: document.getElementById('cfgDesc').value.trim(),
+    mode: document.getElementById('cfgMode').value,
+    source_dir: document.getElementById('cfgUploadDir').value.trim(),
+    upload_dir: document.getElementById('cfgUploadDir').value.trim(),
+    complete_dir: document.getElementById('cfgCompleteDir').value.trim(),
+    tag_id: tagId,
+    currency_id: (currentConfig && currentConfig.currency_id) ? currentConfig.currency_id : "MR9Xdjv70WpeODE8DEPLAyb8xVBQzq31"
+  };
+}
+
+function openPresetModal() {
+  const modal = document.getElementById('modalPresetName');
+  const input = document.getElementById('inputPresetName');
+  if (input) input.value = '';
+  if (modal) modal.classList.add('active');
+  setTimeout(() => { if (input) input.focus(); }, 100);
+}
+
+function closePresetModal() {
+  const modal = document.getElementById('modalPresetName');
+  if (modal) modal.classList.remove('active');
+}
+
+function confirmSavePreset() {
+  const input = document.getElementById('inputPresetName');
+  const name = input ? input.value.trim() : '';
+  if (!name) {
+    alert("Masukkan nama preset terlebih dahulu.");
+    return;
+  }
+  const cfg = getFormData();
+  cfg.active_preset = name;
+  if (window.pywebview && window.pywebview.api) {
+    window.pywebview.api.save_preset(name, cfg).then(presets => {
+      renderPresets(presets, name);
+      closePresetModal();
+      if (window.pywebview.api.set_active_preset) {
+        window.pywebview.api.set_active_preset(name);
+      }
+    });
+  }
+}
+
+function deletePreset() {
+  const sel = document.getElementById('presetSelect');
+  const name = sel.value;
+  if (!name) {
+    alert("Pilih preset yang ingin dihapus terlebih dahulu.");
+    return;
+  }
+  if (confirm(`Yakin ingin menghapus preset '${name}'?`)) {
+    if (window.pywebview && window.pywebview.api) {
+      window.pywebview.api.delete_preset(name).then(presets => {
+        renderPresets(presets);
+      });
+    }
+  }
+}
+
+// --------------------------------------------------------------------------
+// ANTI-DUPLIKAT MODAL
+// --------------------------------------------------------------------------
+function openDuplicateModal() {
+  const modal = document.getElementById('modalDuplicates');
+  if (modal) modal.classList.add('active');
+  if (window.pywebview && window.pywebview.api) {
+    window.pywebview.api.get_duplicate_count().then(count => {
+      document.getElementById('dupCountText').textContent = `Total foto terindeks dalam Anti-Duplikat: ${count || 0} Foto`;
+    });
+  }
+}
+
+function closeDuplicateModal() {
+  const modal = document.getElementById('modalDuplicates');
+  if (modal) modal.classList.remove('active');
+}
+
+function reindexDuplicates() {
+  if (window.pywebview && window.pywebview.api) {
+    window.pywebview.api.reindex_duplicates().then(count => {
+      document.getElementById('dupCountText').textContent = `Total foto terindeks dalam Anti-Duplikat: ${count || 0} Foto`;
+    });
+  }
+}
+
+function clearDuplicates() {
+  if (confirm("Yakin ingin menghapus seluruh riwayat Anti-Duplikat?\nFoto yang sama akan bisa dikompres dan diunggah ulang.")) {
+    if (window.pywebview && window.pywebview.api) {
+      window.pywebview.api.clear_duplicates().then(count => {
+        document.getElementById('dupCountText').textContent = `Total foto terindeks dalam Anti-Duplikat: ${count || 0} Foto`;
+      });
+    }
+  }
+}
+
+// --------------------------------------------------------------------------
+// PROCESS CONTROL (Mulai / Berhenti)
+// --------------------------------------------------------------------------
+function toggleStartStop() {
+  const btn = document.getElementById('btnStartStop');
+  if (!isRunning) {
+    const data = getFormData();
+    if (!data.username || !data.password) {
+      alert("Username dan password tidak boleh kosong!");
+      return;
+    }
+    if (window.pywebview && window.pywebview.api) {
+      window.pywebview.api.start_upload(data).then(ok => {
+        if (ok) {
+          isRunning = true;
+          btn.disabled = false;
+          btn.textContent = "🛑 Berhenti";
+          btn.classList.add("running");
+        }
+      });
+    }
+  } else {
+    if (window.pywebview && window.pywebview.api) {
+      window.pywebview.api.stop_upload().then(() => {
+        isRunning = false;
+        btn.textContent = "🚀 Mulai Proses";
+        btn.classList.remove("running");
+        checkFormValidity();
+      });
+    }
+  }
+}
+
+function resetCounters() {
+  if (window.pywebview && window.pywebview.api) {
+    window.pywebview.api.reset_counters();
+  }
+}
+
+function retryFailed() {
+  if (window.pywebview && window.pywebview.api) {
+    window.pywebview.api.retry_failed();
+  }
+}
+
+// --------------------------------------------------------------------------
+// LOG DRAWER & FILTERING
+// --------------------------------------------------------------------------
+function toggleLog() {
+  isLogOpen = !isLogOpen;
+  const drawer = document.getElementById('logDrawer');
+  const arrow = document.getElementById('logToggleArrow');
+  if (isLogOpen) {
+    drawer.style.display = 'flex';
+    arrow.textContent = "▼ Tutup Log";
+  } else {
+    drawer.style.display = 'none';
+    arrow.textContent = "▲ Buka Log";
+  }
+  if (window.pywebview && window.pywebview.api) {
+    window.pywebview.api.toggle_log(isLogOpen);
+  }
+}
+
+function filterLogs(status) {
+  currentLogFilter = status;
+  document.querySelectorAll('.log-filters .filter-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.filter === status);
+  });
+  renderLogs();
+}
+
+function clearLogs() {
+  allLogs = [];
+  document.getElementById('tbodyLogs').innerHTML = '';
+  if (window.pywebview && window.pywebview.api) {
+    window.pywebview.api.clear_logs();
+  }
+}
+
+function renderLogs() {
+  const tbody = document.getElementById('tbodyLogs');
+  tbody.innerHTML = '';
+  const filtered = (currentLogFilter === 'all')
+    ? allLogs
+    : allLogs.filter(l => (l.status || '').toLowerCase() === currentLogFilter.toLowerCase());
+
+  filtered.slice(-200).forEach(l => {
+    const tr = document.createElement('tr');
+    let colorClass = "text-info";
+    if (l.status === 'ok') colorClass = "text-success";
+    else if (l.status === 'fail') colorClass = "text-danger";
+    else if (l.status === 'skip') colorClass = "text-warning";
+
+    tr.innerHTML = `
+      <td>${escapeHtml(l.stamp)}</td>
+      <td><strong>${escapeHtml(l.action)}</strong></td>
+      <td title="${escapeHtml(l.filename)}">${escapeHtml(l.filename || '-')}</td>
+      <td title="${escapeHtml(l.info)}">${escapeHtml(l.info || '')}</td>
+      <td class="td-center ${colorClass}"><strong>${escapeHtml((l.status || 'INFO').toUpperCase())}</strong></td>
+    `;
+    tbody.appendChild(tr);
+  });
+  const wrap = document.querySelector('.log-table-wrap');
+  if (wrap) wrap.scrollTop = wrap.scrollHeight;
+}
+
+// --------------------------------------------------------------------------
+// PYWEBVIEW CALLBACKS (Called from Python backend)
+// --------------------------------------------------------------------------
+window.onStatusUpdate = function(data) {
+  const textEl = document.getElementById('statusText');
+  const dotEl = document.getElementById('statusDot');
+  if (textEl) textEl.textContent = data.text || "";
+  if (dotEl) {
+    dotEl.className = 'status-dot ' + (data.color || 'green');
+  }
+  if (data.text && (data.text.includes("Dihentikan") || data.text.includes("Selesai"))) {
+    isRunning = false;
+    const btn = document.getElementById('btnStartStop');
+    if (btn) {
+      btn.textContent = "🚀 Mulai Proses";
+      btn.classList.remove("running");
+      checkFormValidity();
+    }
+  }
+};
+
+window.onQueueUpdate = function(data) {
+  const qEl = document.getElementById('queueText');
+  if (qEl && data && data.text) {
+    qEl.textContent = data.text;
+  }
+};
+
+window.onProgressUpdate = function(pct) {
+  const p = Math.max(0, Math.min(100, parseFloat(pct) || 0));
+  const fill = document.getElementById('pbFill');
+  const pctEl = document.getElementById('pbPct');
+  const lblEl = document.getElementById('pbLabel');
+  if (fill) fill.style.width = p + "%";
+  if (pctEl) pctEl.textContent = Math.round(p) + "%";
+  if (lblEl) lblEl.textContent = (p >= 100) ? "Selesai" : (p > 0 ? "Memproses..." : "Menunggu proses...");
+};
+
+window.onCounterUpdate = function(c) {
+  if (!c) return;
+  document.getElementById('cntCompOk').textContent = c.c_ok || 0;
+  document.getElementById('cntCompFail').textContent = c.c_fail || 0;
+  document.getElementById('cntUpOk').textContent = c.u_ok || 0;
+  document.getElementById('cntUpFail').textContent = c.u_fail || 0;
+};
+
+window.onLogRow = function(row, counts) {
+  if (!row) return;
+  allLogs.push(row);
+  if (allLogs.length > 2000) allLogs.shift();
+  if (counts) {
+    document.getElementById('logSummaryText').textContent =
+      `Log Aktivitas (OK: ${counts.ok || 0} | Gagal: ${counts.fail || 0} | Info: ${counts.info || 0} | Skip: ${counts.skip || 0})`;
+  }
+  if (currentLogFilter === 'all' || (row.status || '').toLowerCase() === currentLogFilter.toLowerCase()) {
+    const tbody = document.getElementById('tbodyLogs');
+    const tr = document.createElement('tr');
+    let colorClass = "text-info";
+    if (row.status === 'ok') colorClass = "text-success";
+    else if (row.status === 'fail') colorClass = "text-danger";
+    else if (row.status === 'skip') colorClass = "text-warning";
+
+    tr.innerHTML = `
+      <td>${escapeHtml(row.stamp)}</td>
+      <td><strong>${escapeHtml(row.action)}</strong></td>
+      <td title="${escapeHtml(row.filename)}">${escapeHtml(row.filename || '-')}</td>
+      <td title="${escapeHtml(row.info)}">${escapeHtml(row.info || '')}</td>
+      <td class="td-center ${colorClass}"><strong>${escapeHtml((row.status || 'INFO').toUpperCase())}</strong></td>
+    `;
+    tbody.appendChild(tr);
+    const wrap = document.querySelector('.log-table-wrap');
+    if (wrap) wrap.scrollTop = wrap.scrollHeight;
+  }
+};
+
+// --------------------------------------------------------------------------
+// STATISTIK MODULE
+// --------------------------------------------------------------------------
+function switchStatSubTab(tab) {
+  document.querySelectorAll('.subtabs-bar .subtab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.subtab-content').forEach(c => c.classList.remove('active'));
+
+  if (tab === 'dates') {
+    document.getElementById('subtabBtnDates').classList.add('active');
+    document.getElementById('subtabDates').classList.add('active');
+  } else if (tab === 'leaderboard') {
+    document.getElementById('subtabBtnLeaderboard').classList.add('active');
+    document.getElementById('subtabLeaderboard').classList.add('active');
+    renderLeaderboard();
+  } else if (tab === 'sold') {
+    document.getElementById('subtabBtnSold').classList.add('active');
+    document.getElementById('subtabSold').classList.add('active');
+    renderSoldTable();
+  }
+}
+
+let statProgressTimeout = null;
+
+function setStatProgress(pct, label, show = true) {
+  const box = document.getElementById('statProgressBox');
+  const fill = document.getElementById('statPbFill');
+  const pctEl = document.getElementById('statPbPct');
+  const lblEl = document.getElementById('statPbLabel');
+  if (!box || !fill || !pctEl || !lblEl) return;
+  if (!show) {
+    box.style.display = 'none';
+    return;
+  }
+  if (statProgressTimeout) {
+    clearTimeout(statProgressTimeout);
+    statProgressTimeout = null;
+  }
+  box.style.display = 'block';
+  const val = Math.min(100, Math.max(0, Math.round(pct)));
+  fill.style.width = val + '%';
+  pctEl.textContent = val + '%';
+  if (label) lblEl.textContent = label;
+}
+
+window.onStatProgress = function(pct, label) {
+  setStatProgress(pct, label, true);
+  if (pct >= 100) {
+    statProgressTimeout = setTimeout(() => {
+      setStatProgress(0, "", false);
+    }, 3500);
+  }
+};
+
+function openModalConfirmUpdateAll() {
+  document.getElementById('modalConfirmUpdateAll').classList.add('active');
+}
+
+function closeModalConfirmUpdateAll() {
+  document.getElementById('modalConfirmUpdateAll').classList.remove('active');
+}
+
+function proceedUpdateAllData() {
+  closeModalConfirmUpdateAll();
+  loadStatistics(true);
+}
+
+function loadStatistics(force = false) {
+  const u = (document.getElementById('cfgUsername').value || '').trim();
+  const p = (document.getElementById('cfgPassword').value || '');
+  const tbody = document.getElementById('tbodyDates');
+  if (tbody && (!currentStatistics || !currentStatistics.dates || currentStatistics.dates.length === 0)) {
+    tbody.innerHTML = '<tr><td colspan="10" class="td-center" style="padding: 24px;">Memuat data statistik dari FotoYu... Mohon tunggu.</td></tr>';
+  }
+  setStatProgress(5, force ? "Memulai Update All Data dari FotoYu..." : "Membaca cache statistik / memeriksa update...", true);
+  if (window.pywebview && window.pywebview.api) {
+    window.onStatusUpdate({ text: force ? "Memperbarui seluruh data statistik FotoYu..." : "Memuat data statistik dari FotoYu...", color: "yellow" });
+    window.pywebview.api.fetch_statistics(force, u, p).then(data => {
+      if (data) {
+        currentStatistics = data;
+        applyStatFilter();
+        setStatProgress(100, "Data statistik berhasil dimuat.", true);
+        statProgressTimeout = setTimeout(() => {
+          setStatProgress(0, "", false);
+        }, 3500);
+        window.onStatusUpdate({ text: "Data statistik berhasil diperbarui.", color: "green" });
+      } else {
+        if (tbody && (!currentStatistics || !currentStatistics.dates)) {
+          tbody.innerHTML = '<tr><td colspan="10" class="td-center" style="padding: 24px; color: var(--danger);">Gagal memuat statistik. Pastikan username & password benar dan koneksi stabil.</td></tr>';
+        }
+        setStatProgress(100, "Gagal memuat statistik. Cek koneksi/login.", true);
+        statProgressTimeout = setTimeout(() => {
+          setStatProgress(0, "", false);
+        }, 4000);
+        window.onStatusUpdate({ text: "Gagal memuat statistik. Cek koneksi/login.", color: "red" });
+      }
+    }).catch(err => {
+      if (tbody && (!currentStatistics || !currentStatistics.dates)) {
+        tbody.innerHTML = `<tr><td colspan="10" class="td-center" style="padding: 24px; color: var(--danger);">Error memuat statistik: ${escapeHtml(err)}</td></tr>`;
+      }
+      setStatProgress(100, "Error memuat statistik: " + err, true);
+      statProgressTimeout = setTimeout(() => {
+        setStatProgress(0, "", false);
+      }, 4000);
+      window.onStatusUpdate({ text: "Error memuat statistik: " + err, color: "red" });
+    });
+  }
+}
+
+function formatDateInput(input) {
+  let v = input.value.replace(/[^\d]/g, '');
+  if (v.length > 8) v = v.slice(0, 8);
+  let formatted = '';
+  if (v.length > 0) formatted += v.slice(0, 2);
+  if (v.length > 2) formatted += '/' + v.slice(2, 4);
+  if (v.length > 4) formatted += '/' + v.slice(4, 8);
+  input.value = formatted;
+  if (formatted.length === 10) {
+    applyStatFilterFromDisplay();
+  }
+}
+
+function openNativeDatePicker(type) {
+  const nativeEl = document.getElementById(type === 'start' ? 'statDateStartNative' : 'statDateEndNative');
+  if (nativeEl) {
+    if (typeof nativeEl.showPicker === 'function') {
+      try { nativeEl.showPicker(); } catch (e) { nativeEl.click(); }
+    } else {
+      nativeEl.click();
+    }
+  }
+}
+
+function syncNativeToDisp(type) {
+  const nativeEl = document.getElementById(type === 'start' ? 'statDateStartNative' : 'statDateEndNative');
+  const dispEl = document.getElementById(type === 'start' ? 'statDateStartDisp' : 'statDateEndDisp');
+  if (!nativeEl || !dispEl) return;
+  const val = nativeEl.value; // YYYY-MM-DD
+  if (val && val.length === 10) {
+    const parts = val.split('-');
+    dispEl.value = `${parts[2]}/${parts[1]}/${parts[0]}`;
+  } else {
+    dispEl.value = '';
+  }
+  applyStatFilterFromDisplay();
+}
+
+function parseDispToIso(dispVal) {
+  if (!dispVal) return '';
+  const parts = dispVal.split('/');
+  if (parts.length === 3 && parts[0].length === 2 && parts[1].length === 2 && parts[2].length === 4) {
+    return `${parts[2]}-${parts[1]}-${parts[0]}`;
+  }
+  return '';
+}
+
+function applyStatFilterFromDisplay() {
+  const sEl = document.getElementById('statDateStartDisp');
+  const eEl = document.getElementById('statDateEndDisp');
+  const dispStart = sEl ? sEl.value.trim() : '';
+  const dispEnd = eEl ? eEl.value.trim() : '';
+  const isoStart = parseDispToIso(dispStart);
+  const isoEnd = parseDispToIso(dispEnd);
+  applyStatFilter(isoStart, isoEnd);
+}
+
+function applyStatFilter(dStart, dEnd) {
+  if (!currentStatistics) return;
+  if (dStart === undefined) {
+    const sEl = document.getElementById('statDateStartDisp');
+    dStart = sEl ? parseDispToIso(sEl.value.trim()) : '';
+  }
+  if (dEnd === undefined) {
+    const eEl = document.getElementById('statDateEndDisp');
+    dEnd = eEl ? parseDispToIso(eEl.value.trim()) : '';
+  }
+
+  let filteredDates = currentStatistics.dates || [];
+  if (dStart) {
+    filteredDates = filteredDates.filter(r => r.raw_date >= dStart);
+  }
+  if (dEnd) {
+    filteredDates = filteredDates.filter(r => r.raw_date <= dEnd);
+  }
+
+  // Recalculate 8 KPI summary cards dynamically
+  let tPhotos = 0, tFaces = 0, tAkPlus = 0, tAkMin = 0, tKonfirm = 0, tSold = 0, tRev = 0;
+  filteredDates.forEach(r => {
+    tPhotos += (r.photos || 0);
+    tFaces += (r.faces || 0);
+    tAkPlus += (r.ak_plus || 0);
+    tAkMin += (r.ak_min || 0);
+    tKonfirm += (r.konfirm || 0);
+    tSold += (r.sold || 0);
+    tRev += (r.est_rev || 0);
+  });
+  const convPct = (tSold / Math.max(1, tPhotos)) * 100;
+
+  document.getElementById('statTotalPhotos').textContent = tPhotos.toLocaleString();
+  document.getElementById('statTotalFaces').textContent = tFaces.toLocaleString();
+  document.getElementById('statTotalAkPlus').textContent = tAkPlus.toLocaleString();
+  document.getElementById('statTotalAkMin').textContent = tAkMin.toLocaleString();
+  document.getElementById('statTotalKonfirm').textContent = tKonfirm.toLocaleString();
+  document.getElementById('statTotalSold').textContent = tSold.toLocaleString();
+  document.getElementById('statTotalRev').textContent = formatIdr(tRev);
+  document.getElementById('statConvRate').textContent = convPct.toFixed(1) + "%";
+
+  const storageTxt = (currentStatistics.summary && currentStatistics.summary.storage_text) ? currentStatistics.summary.storage_text : "-";
+  document.getElementById('statStorageBadge').textContent = `Penyimpanan: ${storageTxt}`;
+
+  // Render Table Dates
+  const tbody = document.getElementById('tbodyDates');
+  tbody.innerHTML = '';
+  filteredDates.forEach(r => {
+    const tr = document.createElement('tr');
+    tr.title = "Dobel klik untuk melihat rincian foto";
+    tr.ondblclick = () => openPhotoDetailModal(r.raw_date, r.date);
+
+    tr.innerHTML = `
+      <td><strong>${escapeHtml(r.date)}</strong></td>
+      <td class="td-right">${r.photos || 0}</td>
+      <td class="td-right">${r.faces || 0}</td>
+      <td class="td-right">${r.ak_plus || 0}</td>
+      <td class="td-right">${r.ak_min || 0}</td>
+      <td class="td-right">${r.konfirm || 0}</td>
+      <td class="td-right text-success"><strong>${r.sold || 0}</strong></td>
+      <td class="td-right text-success">${formatIdr(r.est_rev || 0)}</td>
+      <td>${escapeHtml(r.desc || '-')}</td>
+      <td class="td-center">
+        <button class="btn btn-secondary" style="height: 22px; line-height: 22px; padding: 0 6px; font-size: 11px;" onclick="openPhotoDetailModal('${r.raw_date}', '${r.date}')">Rincian</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  renderLeaderboard();
+  renderSoldTable();
+}
+
+function resetStatFilter() {
+  const sDisp = document.getElementById('statDateStartDisp');
+  const eDisp = document.getElementById('statDateEndDisp');
+  const sNat = document.getElementById('statDateStartNative');
+  const eNat = document.getElementById('statDateEndNative');
+  if (sDisp) sDisp.value = '';
+  if (eDisp) eDisp.value = '';
+  if (sNat) sNat.value = '';
+  if (eNat) eNat.value = '';
+  applyStatFilter('', '');
+}
+
+// --------------------------------------------------------------------------
+// LEADERBOARD (No Icons Inside Tabs, Full Width Table)
+// --------------------------------------------------------------------------
+function setLeaderboardMode(mode) {
+  currentLbMode = mode;
+  document.getElementById('btnLbTree').classList.toggle('active', mode === 'tree');
+  document.getElementById('btnLbDate').classList.toggle('active', mode === 'date');
+  document.getElementById('thLbName').textContent = (mode === 'tree') ? "Nama Fototree" : "Tanggal";
+  renderLeaderboard();
+}
+
+function renderLeaderboard() {
+  if (!currentStatistics || !currentStatistics.leaderboard) return;
+  const list = (currentLbMode === 'tree')
+    ? (currentStatistics.leaderboard.by_tree || [])
+    : (currentStatistics.leaderboard.by_date || []);
+
+  const chartEl = document.getElementById('lbChart');
+  const tbody = document.getElementById('tbodyLeaderboard');
+  chartEl.innerHTML = '';
+  tbody.innerHTML = '';
+
+  const maxSold = list.length > 0 ? Math.max(...list.map(x => x.sold || 0), 1) : 1;
+
+  list.slice(0, 10).forEach((item, idx) => {
+    // Bar row
+    const pct = Math.round(((item.sold || 0) / maxSold) * 100);
+    const rowDiv = document.createElement('div');
+    rowDiv.className = 'chart-bar-row';
+    rowDiv.innerHTML = `
+      <span class="chart-label" title="${escapeHtml(item.name)}">${idx + 1}. ${escapeHtml(item.name)}</span>
+      <div class="chart-bar-track">
+        <div class="chart-bar-value" style="width: ${pct}%"></div>
+      </div>
+      <span class="chart-count">${item.sold || 0} Foto</span>
+    `;
+    chartEl.appendChild(rowDiv);
+
+    // Table row
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="td-center">${idx + 1}</td>
+      <td><strong>${escapeHtml(item.name)}</strong></td>
+      <td class="td-right text-success"><strong>${item.sold || 0}</strong></td>
+      <td class="td-right text-success">${formatIdr(item.est_rev || 0)}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// --------------------------------------------------------------------------
+// SEMUA FOTO TERJUAL TABLE
+// --------------------------------------------------------------------------
+function renderSoldTable() {
+  if (!currentStatistics || !currentStatistics.sold_photos) return;
+  const tbody = document.getElementById('tbodySold');
+  tbody.innerHTML = '';
+
+  if (currentStatistics.sold_photos.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" class="td-center" style="padding: 24px;">Belum ada foto terjual.</td></tr>';
+    return;
+  }
+
+  currentStatistics.sold_photos.forEach(item => {
+    const tr = document.createElement('tr');
+    const thumbUrl = item.thumbnail_url || item.image_url || "";
+    const cid = item.content_id || "";
+    const title = item.title || cid || "Foto";
+    const dateStr = (item.original_at || item.created_at || "").slice(0, 10);
+    const tree = item.fototree || "-";
+    const price = item.price || 0;
+    const net = item.net_price || 0;
+
+    tr.innerHTML = `
+      <td title="${escapeHtml(title)}">${escapeHtml(title)}</td>
+      <td>${escapeHtml(tree)}</td>
+      <td>${escapeHtml(dateStr)}</td>
+      <td>${formatIdr(price)}</td>
+      <td class="text-success"><strong>${formatIdr(net)}</strong></td>
+      <td>
+        <button class="btn btn-secondary" style="height: 22px; line-height: 22px; padding: 0 8px; font-size: 11px;" onclick="openZoomModal('${cid}', '${escapeHtml(title)}', '${thumbUrl}')">Lihat</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// --------------------------------------------------------------------------
+// MODAL: RINCIAN FOTO
+// --------------------------------------------------------------------------
+function openPhotoDetailModal(rawDate, dispDate) {
+  const modal = document.getElementById('modalPhotoDetail');
+  document.getElementById('modalDateTitle').textContent = dispDate || rawDate;
+  modal.classList.add('active');
+
+  const tbody = document.getElementById('tbodyModalPhotos');
+  tbody.innerHTML = '<tr><td colspan="10" class="td-center" style="padding: 20px;">Memuat rincian foto...</td></tr>';
+
+  if (window.pywebview && window.pywebview.api) {
+    window.pywebview.api.get_photo_details(rawDate).then(res => {
+      if (res) {
+        currentModalItems = res.items || [];
+        // Header statistics: User specified "Terjual: x Foto" (capital F)
+        document.getElementById('modalBadgeTotal').textContent = `Total: ${res.stats.total_photos || 0} Foto`;
+        document.getElementById('modalBadgeSold').textContent = `Terjual: ${res.stats.sold_count || 0} Foto`;
+        document.getElementById('modalBadgeEstRev').textContent = `Estimasi Omset: ${formatIdr(res.stats.est_rev || 0)}`;
+        filterModalPhotos('all');
+      }
+    });
+  }
+}
+
+function closePhotoDetailModal() {
+  document.getElementById('modalPhotoDetail').classList.remove('active');
+}
+
+function filterModalPhotos(filter) {
+  currentModalFilter = filter;
+  document.querySelectorAll('.modal-body .filter-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.mfilter === filter);
+  });
+
+  const tbody = document.getElementById('tbodyModalPhotos');
+  tbody.innerHTML = '';
+
+  let filtered = currentModalItems;
+  if (filter === 'sold') {
+    filtered = currentModalItems.filter(x => x.purchase_status === 'sold');
+  } else if (filter === 'available') {
+    filtered = currentModalItems.filter(x => x.purchase_status !== 'sold');
+  }
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="10" class="td-center" style="padding: 20px;">Tidak ada data foto pada filter ini.</td></tr>';
+    return;
+  }
+
+  filtered.forEach(it => {
+    const tr = document.createElement('tr');
+    const isSold = (it.purchase_status === 'sold');
+    const statusText = isSold ? '<span class="text-success"><strong>Terjual</strong></span>' : '<span class="text-muted">Tersedia</span>';
+    const cid = it.content_id || "";
+    const title = it.title || cid || "Foto";
+
+    tr.innerHTML = `
+      <td title="${escapeHtml(title)}">${escapeHtml(title)}</td>
+      <td>${escapeHtml(it.fototree || '-')}</td>
+      <td>${escapeHtml(it.dim_str || '-')}</td>
+      <td>${escapeHtml(it.size_str || '-')}</td>
+      <td>${it.face_count || 0}</td>
+      <td>${escapeHtml(it.robofind_status || 'OK')}</td>
+      <td>${statusText}</td>
+      <td>${formatIdr(it.price || 0)}</td>
+      <td class="text-success"><strong>${formatIdr(it.net_price || 0)}</strong></td>
+      <td>
+        <button class="btn btn-secondary" style="height: 22px; line-height: 22px; padding: 0 8px; font-size: 11px;" onclick="openZoomModal('${cid}', '${escapeHtml(title)}')">Lihat</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// --------------------------------------------------------------------------
+// MODAL: ZOOM PREVIEW (Orientation & Scheme Preserved)
+// --------------------------------------------------------------------------
+function openZoomModal(contentId, title, fallbackUrl = "") {
+  const modal = document.getElementById('modalZoom');
+  const img = document.getElementById('zoomImg');
+  const cap = document.getElementById('zoomCaption');
+
+  img.src = "";
+  cap.textContent = `Memuat pratinjau: ${title || contentId}...`;
+  modal.classList.add('active');
+
+  if (window.pywebview && window.pywebview.api) {
+    window.pywebview.api.get_image_preview_info(contentId, title).then(info => {
+      if (info && info.preview_url) {
+        img.src = info.preview_url;
+        cap.textContent = `${info.title} (${info.dim_str} | ${info.size_str})`;
+      } else if (fallbackUrl) {
+        img.src = fallbackUrl;
+        cap.textContent = title;
+      } else {
+        cap.textContent = `Gagal memuat pratinjau untuk: ${title || contentId}`;
+      }
+    }).catch(() => {
+      if (fallbackUrl) {
+        img.src = fallbackUrl;
+        cap.textContent = title;
+      } else {
+        cap.textContent = `Tidak dapat menampilkan pratinjau: ${title || contentId}`;
+      }
+    });
+  } else if (fallbackUrl) {
+    img.src = fallbackUrl;
+    cap.textContent = title;
+  }
+}
+
+function closeZoomModal(event, force = false) {
+  if (force || event.target.id === 'modalZoom') {
+    document.getElementById('modalZoom').classList.remove('active');
+  }
+}
+
+// --------------------------------------------------------------------------
+// INITIAL LOAD FROM BACKEND
+// --------------------------------------------------------------------------
+let isInitialStateLoaded = false;
+let initRetryCount = 0;
+
+function applyInitialData(data) {
+  if (!data) return;
+  isInitialStateLoaded = true;
+  currentConfig = data.config || {};
+  currentPresets = data.presets || {};
+  const activePreset = currentConfig.active_preset || "";
+  renderPresets(currentPresets, activePreset);
+
+  if (activePreset && currentPresets[activePreset]) {
+    document.getElementById('presetSelect').value = activePreset;
+    onPresetSelected();
+  } else {
+    // Fill inputs from config
+    if (currentConfig.username) document.getElementById('cfgUsername').value = currentConfig.username;
+    if (currentConfig.password) document.getElementById('cfgPassword').value = currentConfig.password;
+    if (currentConfig.price) {
+      document.getElementById('cfgPrice').value = currentConfig.price;
+    }
+    if (currentConfig.fototree || currentConfig.location_name) {
+      document.getElementById('cfgFototree').value = currentConfig.fototree || currentConfig.location_name;
+    }
+    if (currentConfig.tag_id) {
+      document.getElementById('cfgTagId').value = currentConfig.tag_id;
+    }
+    const lat = currentConfig.lat || currentConfig.latitude || "0.0";
+    const lon = currentConfig.lon || currentConfig.longitude || "0.0";
+    document.getElementById('cfgLat').value = lat;
+    document.getElementById('dispLat').value = lat;
+    document.getElementById('cfgLon').value = lon;
+    document.getElementById('dispLon').value = lon;
+
+    if (currentConfig.desc || currentConfig.description) {
+      document.getElementById('cfgDesc').value = currentConfig.desc || currentConfig.description;
+    }
+    if (currentConfig.mode) document.getElementById('cfgMode').value = currentConfig.mode;
+    const upDir = currentConfig.upload_dir || currentConfig.source_dir || "";
+    if (upDir) {
+      document.getElementById('cfgUploadDir').value = upDir;
+      savedSourcePath = upDir.trim();
+    }
+    const compDir = currentConfig.complete_dir || "";
+    if (compDir) {
+      document.getElementById('cfgCompleteDir').value = compDir;
+      savedCompletePath = compDir.trim();
+    }
+    updateFolderOpenButtons();
+    checkFormValidity();
+  }
+
+  if (data.counters) window.onCounterUpdate(data.counters);
+  if (data.queue_text) document.getElementById('queueText').textContent = data.queue_text;
+  if (data.status) window.onStatusUpdate(data.status);
+  if (currentConfig.theme) setTheme(currentConfig.theme);
+}
+
+/*__INITIAL_DATA_PLACEHOLDER__*/
+if (typeof window.__INITIAL_DATA__ !== 'undefined' && window.__INITIAL_DATA__) {
+  applyInitialData(window.__INITIAL_DATA__);
+}
+
+function tryLoadInitialState() {
+  if (window.pywebview && window.pywebview.api) {
+    window.pywebview.api.get_initial_data().then(data => {
+      applyInitialData(data);
+    }).catch(() => {});
+  } else if (initRetryCount < 60) {
+    initRetryCount++;
+    setTimeout(tryLoadInitialState, 100);
+  }
+}
+
+// Background queue polling from JS side (3-second interval, purely non-blocking)
+setInterval(() => {
+  if (window.pywebview && window.pywebview.api && !isRunning) {
+    window.pywebview.api.refresh_queue().then(res => {
+      if (res && res.text) {
+        const qEl = document.getElementById('queueText');
+        if (qEl) qEl.textContent = res.text;
+      }
+    }).catch(() => {});
+  }
+}, 3000);
+
+window.addEventListener('pywebviewready', tryLoadInitialState);
+window.addEventListener('DOMContentLoaded', tryLoadInitialState);
+setTimeout(tryLoadInitialState, 50);
+setTimeout(tryLoadInitialState, 250);
+setTimeout(tryLoadInitialState, 800);
+
+// ==========================================================================
+// UNIVERSAL TABLE HEADER SORTING (Click th to Sort Ascending/Descending)
+// ==========================================================================
+function getCellSortValue(cell) {
+  const text = cell.textContent.trim();
+  if (!text) return { type: 'string', val: '' };
+
+  // 1. Currency: e.g. "Rp 35.000", "Rp 0"
+  if (/^Rp\s*[\d.,]+/i.test(text)) {
+    const num = parseFloat(text.replace(/[^\d]/g, '')) || 0;
+    return { type: 'number', val: num };
+  }
+
+  // 2. Percentage: e.g. "12.5%"
+  if (/^[\d.,]+%$/.test(text)) {
+    const num = parseFloat(text.replace('%', '').replace(',', '.')) || 0;
+    return { type: 'number', val: num };
+  }
+
+  // 3. Integer or float with optional units (KB, MB, px, Foto)
+  if (/^[\d.,]+(\s*(KB|MB|px|Foto))?$/i.test(text)) {
+    const num = parseFloat(text.replace(/[^\d.]/g, '')) || 0;
+    return { type: 'number', val: num };
+  }
+
+  // 4. Dates: check DD/MM/YYYY or DD-MM-YYYY
+  const dmyMatch = text.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
+  if (dmyMatch) {
+    const dVal = new Date(parseInt(dmyMatch[3], 10), parseInt(dmyMatch[2], 10) - 1, parseInt(dmyMatch[1], 10)).getTime();
+    return { type: 'date', val: dVal };
+  }
+  // Try Date.parse for ISO or other standard dates
+  const parsedDate = Date.parse(text);
+  if (!isNaN(parsedDate) && text.length >= 8) {
+    return { type: 'date', val: parsedDate };
+  }
+
+  return { type: 'string', val: text.toLowerCase() };
+}
+
+document.addEventListener('click', function(e) {
+  const th = e.target.closest('th');
+  if (!th) return;
+  const table = th.closest('table');
+  if (!table) return;
+  const tbody = table.querySelector('tbody');
+  if (!tbody) return;
+
+  const thText = th.textContent.replace(/[▲▼]/g, '').trim().toLowerCase();
+  if (thText === 'aksi') return;
+
+  const colIdx = Array.from(th.parentNode.children).indexOf(th);
+  if (colIdx < 0) return;
+
+  const rows = Array.from(tbody.querySelectorAll('tr'));
+  if (rows.length === 0) return;
+  if (rows.length === 1 && rows[0].querySelector('td[colspan]')) return;
+
+  const isAsc = th.dataset.sortDir !== 'asc';
+  th.dataset.sortDir = isAsc ? 'asc' : 'desc';
+
+  table.querySelectorAll('th').forEach(otherTh => {
+    if (otherTh !== th) {
+      delete otherTh.dataset.sortDir;
+      const arrow = otherTh.querySelector('.sort-arrow');
+      if (arrow) arrow.remove();
+    }
+  });
+
+  let arrow = th.querySelector('.sort-arrow');
+  if (!arrow) {
+    arrow = document.createElement('span');
+    arrow.className = 'sort-arrow';
+    arrow.style.marginLeft = '4px';
+    arrow.style.fontSize = '9px';
+    arrow.style.opacity = '0.85';
+    th.appendChild(arrow);
+  }
+  arrow.textContent = isAsc ? '▲' : '▼';
+
+  rows.sort((rowA, rowB) => {
+    const cellA = rowA.children[colIdx];
+    const cellB = rowB.children[colIdx];
+    if (!cellA || !cellB) return 0;
+
+    const valA = getCellSortValue(cellA);
+    const valB = getCellSortValue(cellB);
+
+    if (valA.type === 'number' && valB.type === 'number') {
+      return isAsc ? (valA.val - valB.val) : (valB.val - valA.val);
+    }
+    if (valA.type === 'date' && valB.type === 'date') {
+      return isAsc ? (valA.val - valB.val) : (valB.val - valA.val);
+    }
+    return isAsc
+      ? String(valA.val).localeCompare(String(valB.val), undefined, { numeric: true, sensitivity: 'base' })
+      : String(valB.val).localeCompare(String(valA.val), undefined, { numeric: true, sensitivity: 'base' });
+  });
+
+  rows.forEach(r => tbody.appendChild(r));
+});
+
+</script>
+</body>
+</html>

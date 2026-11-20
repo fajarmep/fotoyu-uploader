@@ -1,0 +1,34 @@
+FotoYu Uploader - Portable (macOS)
+==================================
+
+BUILD (membuat DMG)
+-------------------
+1. Install Python dari https://www.python.org/downloads/macos/
+   Versi python.org bersifat UNIVERSAL2 -> hasil build otomatis Universal
+   (Intel + Apple Silicon). Python dari Homebrew/MacPorts biasanya hanya
+   arsitektur PC Anda saja (tidak universal).
+2. Terminal di folder ini:  chmod +x build_macos.command
+3. Klik dua kali "build_macos.command".
+4. Hasil: "Portable MacOS/FotoYu Uploader.dmg".
+   DMG berisi HANYA aplikasi terkompilasi (TANPA file sumber .py).
+
+INSTALL DI MAC TARGET
+---------------------
+1. Buka "FotoYu Uploader.dmg".
+2. Klik dua kali "Install FotoYu Uploader.command".
+3. Pilih folder yang BISA DITULIS (mis. Documents).
+   JANGAN pilih root "Macintosh HD" -> dilindungi sistem (read-only).
+4. Installer membuat folder "Portable MacOS" + shortcut di Desktop.
+
+CARA PAKAI APLIKASI
+-------------------
+1. Isi Username, Password, Harga, pilih Fototree, Deskripsi (opsional), klik Save.
+2. Klik START. Taruh foto ke folder "Upload" di sebelah aplikasi.
+   Foto dikompres (<= 500 KB) -> masuk "Compress" -> diupload ke Fotoyu ->
+   file di "Compress" dihapus, file asli dipindah ke "Complete".
+
+CATATAN
+-------
+- Aplikasi sudah mandiri (Python dibundel) -> pengguna TIDAK perlu install Python.
+- macOS tidak menjalankan script otomatis saat DMG di-mount; installer diklik dua kali.
+- Tanpa notarization, Gatekeeper memperingatkan: klik kanan aplikasi -> Open -> Open.
